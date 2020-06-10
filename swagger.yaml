@@ -1,0 +1,610 @@
+swagger: "2.0"
+info:
+  description: "This is a sample Category Manager server made as a test task."
+  version: "1.0.0"
+  title: "Category Manager"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/"
+tags:
+  - name: "categories"
+    description: "Category management"
+  - name: "products"
+    description: "Product management"
+schemes:
+  - "http"
+paths:
+  /categories:
+    post:
+      tags:
+        - "categories"
+      summary: "Add new category"
+      description: ""
+      operationId: "addCategory"
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Name of the new category and the name of parent category (optional)"
+          required: true
+          schema:
+            $ref: "#/definitions/AddCategoryRequest"
+      responses:
+        "400":
+          description: "Bad Request"
+    get:
+      tags:
+        - "categories"
+      summary: "Get all categories and products"
+      description: ""
+      operationId: "getAllCategories"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "All categories with subcategories and product infoes"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/GetCategoryResponse"
+  /categories/{category}:
+    get:
+      tags:
+        - "categories"
+      summary: "Get category info"
+      description: ""
+      operationId: "getCategory"
+      parameters:
+        - name: "category"
+          in: "path"
+          description: "Name of the category to return"
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "All categories with subcategories and product infoes"
+          schema:
+            $ref: "#/definitions/GetCategoryResponse"
+        "404":
+          description: "Not Found"
+    put:
+      tags:
+        - "categories"
+      summary: "Edit the category"
+      description: ""
+      operationId: "editCategory"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "category"
+          in: "path"
+          description: "Name of the category to edit"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Category parameters to edit"
+          required: true
+          schema:
+            $ref: "#/definitions/EditCategoryRequest"
+      responses:
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Not Found"
+    delete:
+      tags:
+        - "categories"
+      summary: "Remove the category"
+      description: ""
+      operationId: "removeCategory"
+      parameters:
+        - name: "contents"
+          in: "query"
+          description: "Remove contents of the category"
+          type: boolean
+          default: true
+        - name: "category"
+          in: "path"
+          description: "Name of the category to remove"
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "204":
+          description: "No Content"
+  /product:
+    post:
+      tags:
+        - "products"
+      summary: "Add new product"
+      description: ""
+      operationId: "addProduct"
+      consumes:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Name of the new product and it's parameters (product will become uncategorized if category will be left undefined)"
+          required: true
+          schema:
+            $ref: "#/definitions/AddProductRequest"
+      responses:
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Category not found"
+  /product/{product}:
+    get:
+      tags:
+        - "products"
+      summary: "Get product info"
+      description: ""
+      operationId: "getProduct"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product to return"
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Product info successfully returned"
+          schema:
+            $ref: "#/definitions/GetProductResponse"
+        "404":
+          description: "Not Found"
+    put:
+      tags:
+        - "products"
+      summary: "Edit the product"
+      description: ""
+      operationId: "editProduct"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product to edit"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Product parameters to edit (product will become uncategorized if category will be defined as empty string)"
+          required: true
+          schema:
+            $ref: "#/definitions/EditProductRequest"
+      responses:
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Not Found"
+    delete:
+      tags:
+        - "products"
+      summary: "Remove the product"
+      description: ""
+      operationId: "removeProduct"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product to remove"
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "204":
+          description: "No Content"
+  /product/{product}/plans:
+    post:
+      tags:
+        - "products"
+      summary: "Add new price plan"
+      description: ""
+      operationId: "addPricePlan"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Name of the new price plan and it's parameters"
+          required: true
+          schema:
+            $ref: "#/definitions/AddPricePlanRequest"
+      responses:
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Product not found"
+  /product/{product}/plans/{plan}:
+    get:
+      tags:
+        - "products"
+      summary: "Get price plan info"
+      description: ""
+      operationId: "getPricePlan"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product"
+          required: true
+          type: "string"
+        - name: "plan"
+          in: "path"
+          description: "Name of the price plan to return"
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Price plan info successfully returned"
+          schema:
+            $ref: "#/definitions/GetPricePlanResponse"
+        "404":
+          description: "Not Found"
+    put:
+      tags:
+        - "products"
+      summary: "Edit the price plan"
+      description: ""
+      operationId: "editPricePlan"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product"
+          required: true
+          type: "string"
+        - name: "plan"
+          in: "path"
+          description: "Name of the price plan to edit"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Price plan parameters to edit"
+          required: true
+          schema:
+            $ref: "#/definitions/EditPricePlanRequest"
+      responses:
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Not Found"
+    delete:
+      tags:
+        - "products"
+      summary: "Remove the price plan"
+      description: ""
+      operationId: "removePricePlan"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product"
+          required: true
+          type: "string"
+        - name: "plan"
+          in: "path"
+          description: "Name of the price plan to remove"
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "204":
+          description: "No Content"
+  /product/{product}/plans/{plan}/prices:
+    post:
+      tags:
+        - "products"
+      summary: "Add new price"
+      description: ""
+      operationId: "addPrice"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product"
+          required: true
+          type: "string"
+        - name: "plan"
+          in: "path"
+          description: "Name of the price plan"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "New price's parameters"
+          required: true
+          schema:
+            $ref: "#/definitions/Price"
+      responses:
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Price plan not found"
+  /product/{product}/plans/{plan}/prices/{price}:
+    get:
+      tags:
+        - "products"
+      summary: "Get price info"
+      description: ""
+      operationId: "getPrice"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product"
+          required: true
+          type: "string"
+        - name: "plan"
+          in: "path"
+          description: "Name of the price plan"
+          required: true
+          type: "string"
+        - name: "price"
+          in: "path"
+          description: "Name of the price to return"
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Price info successfully returned"
+          schema:
+            $ref: "#/definitions/Price"
+        "404":
+          description: "Not Found"
+    put:
+      tags:
+        - "products"
+      summary: "Edit the price plan"
+      description: ""
+      operationId: "editPrice"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product"
+          required: true
+          type: "string"
+        - name: "plan"
+          in: "path"
+          description: "Name of the price plan"
+          required: true
+          type: "string"
+        - name: "price"
+          in: "path"
+          description: "Name of the price to edit"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Price parameters to edit"
+          required: true
+          schema:
+            $ref: "#/definitions/EditPriceRequest"
+      responses:
+        "400":
+          description: "Bad Request"
+        "404":
+          description: "Not Found"
+    delete:
+      tags:
+        - "products"
+      summary: "Remove the price plan"
+      description: ""
+      operationId: "removePriceP"
+      parameters:
+        - name: "product"
+          in: "path"
+          description: "Name of the product"
+          required: true
+          type: "string"
+        - name: "plan"
+          in: "path"
+          description: "Name of the price plan"
+          required: true
+          type: "string"
+        - name: "price"
+          in: "path"
+          description: "Name of the price to remove"
+          required: true
+          type: "string"
+      produces:
+        - "application/json"
+      responses:
+        "204":
+          description: "No Content"
+definitions:
+  AddCategoryRequest:
+    type: "object"
+    required:
+      - "name"
+    properties:
+      name:
+        type: "string"
+        example: "Providers"
+      parent:
+        type: "string"
+        example: "Telecom"
+  EditCategoryRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "Providers"
+      parent:
+        type: "string"
+        example: "Telecom"
+  GetCategoryResponse:
+    type: "object"
+    required:
+      - "name"
+    properties:
+      name:
+        type: "string"
+        example: "Providers"
+      subcategories:
+        type: "array"
+        items:
+          $ref: "#/definitions/GetCategoryResponse"
+      products:
+        type: "array"
+        items:
+          $ref: "#/definitions/ProductView"
+  ProductView:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "Gondor Telecom"
+      description:
+        type: "string"
+        example: "Best provider west of Anduin!"
+  AddProductRequest:
+    type: "object"
+    required:
+      - "name"
+    properties:
+      name:
+        type: "string"
+        example: "Gondor Telecom"
+      description:
+        type: "string"
+        example: "Best provider west of Anduin!"
+      category:
+        type: "string"
+        example: "Providers"
+  GetProductResponse:
+    type: "object"
+    required:
+      - "name"
+    properties:
+      name:
+        type: "string"
+        example: "Gondor Telecom"
+      description:
+        type: "string"
+        example: "Best provider west of Anduin!"
+      category:
+        type: "string"
+        example: "Providers"
+      plans:
+        type: "array"
+        items:
+          $ref: "#/definitions/GetPricePlanResponse"
+  EditProductRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "Gondor Telecom"
+      description:
+        type: "string"
+        example: "Best provider west of Anduin!"
+      category:
+        type: "string"
+        example: "Providers"
+  AddPricePlanRequest:
+    type: "object"
+    required:
+      - "name"
+      - "from"
+      - "until"
+    properties:
+      name:
+        type: "string"
+        example: "Return of the king"
+      description:
+        type: "string"
+        example: "Special plan to the anniversary of king Elessar's coronation"
+      since:
+        type: "string"
+        format: "date"
+      until:
+        type: "string"
+        format: "date"
+  GetPricePlanResponse:
+    type: "object"
+    required:
+      - "name"
+      - "from"
+      - "until"
+    properties:
+      name:
+        type: "string"
+        example: "Return of the king"
+      description:
+        type: "string"
+        example: "Special plan to the anniversary of king Elessar's coronation"
+      since:
+        type: "string"
+        format: "date"
+      until:
+        type: "string"
+        format: "date"
+      prices:
+        type: "array"
+        items:
+          $ref: "#/definitions/Price"
+  EditPricePlanRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "Return of the king"
+      description:
+        type: "string"
+        example: "Special plan to the anniversary of king Elessar's coronation"
+      since:
+        type: "string"
+        format: "date"
+      until:
+        type: "string"
+        format: "date"
+  Price:
+    type: "object"
+    required:
+      - "currency"
+      - "amount"
+    properties:
+      description:
+        type: "string"
+        example: "100 GB/month"
+      currency:
+        type: "string"
+        example: "GND"
+      amount:
+        type: "number"
+        example: 9.99
+  EditPriceRequest:
+    type: "object"
+    properties:
+      description:
+        type: "string"
+        example: "100 GB/month"
+      currency:
+        type: "string"
+        example: "GND"
+      amount:
+        type: "number"
+        example: 9.99
